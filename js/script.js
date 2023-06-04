@@ -18,8 +18,96 @@ window.onload = function init() {
 
       var monsterPosX = 0;
       var monsterPosY = 0;
+      var monsterSpeed = 5;
 
       var inputStates = {};
+
+      var grid = [];
+      gridSize = 4;
+
+      function drawGrid(){
+        size = w/gridSize;
+        for (let i = 1; i < gridSize; i++) {
+            ctx.beginPath();
+            ctx.moveTo(size*i, 0);
+            ctx.lineTo(size*i, h);
+            ctx.stroke();
+        }
+        for (let i = 1; i < gridSize; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, size*i);
+            ctx.lineTo(w, size*i);
+            ctx.stroke();
+        }
+      }
+
+      function getAvailableSquares(grid, gridSize){
+        let availableSquares = []; 
+        for (let x=0;x<gridSize;x++){
+            for (let y=0;y<gridSize;y++){
+                if (grid[x][y] == 0){
+                    let pos = x.toString()+' '+y.toString();
+                    availableSquares.push(pos);
+                }
+            }
+        }
+        return availableSquares;
+      }
+
+      function getRandomPosition(availabeSquares){
+        let code = availabeSquares[Math.floor(Math.random()*availabeSquares.length)];
+        square = code.split(" ");
+        var x = square[0];
+        var y = square[1];
+        return [x,y];
+      }
+
+      function createBlock(grid){
+        let pos = getRandomPosition(getAvailableSquares(grid, gridSize));
+        grid[pos[0]][pos[1]] = 2;
+      }
+
+      function startGrid(grid, gridSize){
+
+        for (let i = 0; i < gridSize; i++){
+            line = [];
+            for (let j = 0; j < gridSize; j++) {
+                line.push(0);
+            }
+            grid.push(line);
+        }
+        for (let i = 0; i < 2; i++) {
+            createBlock(grid);
+            }
+        }        
+
+      function drawSquare(x,y){
+        let gridX = (w/gridSize)*y;
+        let gridY = (h/gridSize)*x;
+        let sqHeight = h/gridSize;
+
+        ctx.save();
+        ctx.translate(gridX,gridY);
+        // ctx.fillstyle = "#505050"
+        // ctx.fillRect(0,0,sqHeight,sqHeight);
+
+        ctx.strokeStyle = "black";
+        ctx.font="60px Georgia";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText(grid[x][y], sqHeight/2,sqHeight/2);
+        ctx.restore();
+      }
+
+      function drawGridValues(grid, gridSize){
+        for (let x=0;x<gridSize;x++){
+            for (let y=0;y<gridSize;y++){
+                if (grid[x][y] != 0) {
+                    drawSquare(x,y);
+                }
+            }
+        }
+      }
     
       var measureFPS = function(newTime){
         
@@ -45,8 +133,9 @@ window.onload = function init() {
       };
     
        // clears the canvas content
-       function clearCanvas() {
+       function clearGrid(gridSize) {
          ctx.clearRect(0, 0, w, h);
+         drawGrid();
        }
     
        // Functions for drawing the monster and maybe other objects
@@ -80,6 +169,21 @@ window.onload = function init() {
         // restore the context
         ctx.restore(); 
       }
+
+      function checkInputs(){
+        if (inputStates.left) {
+            monsterPosX -= monsterSpeed;
+        }
+        if (inputStates.up) {
+            monsterPosY -= monsterSpeed;
+        }
+        if (inputStates.right) {
+            monsterPosX += monsterSpeed;
+        }
+        if (inputStates.down) {
+            monsterPosY += monsterSpeed;
+        }
+      }
     
       var mainLoop = function(time){
 
@@ -87,24 +191,13 @@ window.onload = function init() {
           measureFPS(time);
 
           // check inputStates
-        if (inputStates.left) {
-            monsterPosX -= 1;
-        }
-        if (inputStates.up) {
-            monsterPosY -= 1;
-        }
-        if (inputStates.right) {
-            monsterPosX += 1;
-        }
-        if (inputStates.down) {
-            monsterPosY += 1;
-        }
+          checkInputs();
         
-          // Clear the canvas
-          clearCanvas();
-          
-          // draw the monster
-          drawMyMonster(monsterPosX, monsterPosY);
+          // Clear the grid
+          clearGrid(4);
+
+          // Draw values
+          drawGridValues(grid, gridSize);  
         
           // call the animation loop every 1/60th of second
           requestAnimationFrame(mainLoop);
@@ -155,6 +248,8 @@ window.onload = function init() {
         }, false);
     
   
+          startGrid(grid,gridSize);
+
           // start the animation
           requestAnimationFrame(mainLoop);
       };
