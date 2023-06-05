@@ -170,20 +170,112 @@ window.onload = function init() {
         ctx.restore(); 
       }
 
-      function checkInputs(){
+      function move(grid, gridSize, direction){
+        switch (direction){
+
+          case "left":
+            for (let x=0;x<gridSize;x++){
+              for (let y=0;y<gridSize;y++){
+                if (grid[x][y] != 0){
+                  let i = y;
+                  while (i>0){
+                    if (grid[x][i-1] != 0){
+                      break;
+                    }
+                    else{
+                      let temp = grid[x][i-1];
+                      grid[x][i-1] = grid[x][i];
+                      grid[x][i] = temp;
+                      i--;
+                    }
+                  }
+                }
+              }
+            }
+            break;
+
+          case "up":
+            for (let x=0;x<gridSize;x++){
+              for (let y=0;y<gridSize;y++){
+                if (grid[x][y] != 0){
+                  let i = x;
+                  while (i>0){
+                    if (grid[i-1][y] != 0){
+                      break;
+                    }
+                    else{
+                      let temp = grid[i-1][y];
+                      grid[i-1][y] = grid[i][y];
+                      grid[i][y] = temp;
+                      i--;
+                    }
+                  }
+                }
+              }
+            }
+            break;
+
+          case "right":
+            for (let x=gridSize-1;x>=0;x--){
+              for (let y=gridSize-1;y>=0;y--){
+                if (grid[x][y] != 0){
+                  let i = y;
+                  while (i<gridSize-1){
+                    if (grid[x][i+1] != 0){
+                      break;
+                    }
+                    else{
+                      let temp = grid[x][i+1];
+                      grid[x][i+1] = grid[x][i];
+                      grid[x][i] = temp;
+                      i++;
+                    }
+                  }
+                }
+              }
+            }
+            break;
+
+          case "down":
+            for (let x=gridSize-1;x>=0;x--){
+              for (let y=gridSize-1;y>=0;y--){
+                if (grid[x][y] != 0){
+                  let i = x;
+                  while (i<gridSize-1){
+                    if (grid[i+1][y] != 0){
+                      break;
+                    }
+                    else{
+                      let temp = grid[i+1][y];
+                      grid[i+1][y] = grid[i][y];
+                      grid[i][y] = temp;
+                      i++;
+                    }
+                  }
+                }
+              }
+            }
+            break;
+
+        }
+        console.log(grid);
+
+      }
+
+      function checkInputs(grid, gridSize){
         if (inputStates.left) {
-            monsterPosX -= monsterSpeed;
+            move(grid, gridSize, 'left');   
         }
         if (inputStates.up) {
-            monsterPosY -= monsterSpeed;
+          move(grid, gridSize, 'up');  
         }
         if (inputStates.right) {
-            monsterPosX += monsterSpeed;
+          move(grid, gridSize, 'right');
         }
         if (inputStates.down) {
-            monsterPosY += monsterSpeed;
+          move(grid, gridSize, 'down');
         }
-      }
+      }  
     
       var mainLoop = function(time){
 
@@ -191,10 +283,10 @@ window.onload = function init() {
           measureFPS(time);
 
           // check inputStates
-          checkInputs();
+          checkInputs(grid, gridSize);
         
           // Clear the grid
-          clearGrid(4);
+          clearGrid(gridSize);
 
           // Draw values
           drawGridValues(grid, gridSize);  
@@ -249,6 +341,7 @@ window.onload = function init() {
     
   
           startGrid(grid,gridSize);
+          console.log(grid);
 
           // start the animation
           requestAnimationFrame(mainLoop);
