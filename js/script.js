@@ -16,11 +16,8 @@ window.onload = function init() {
       var fpsContainer;
       var fps; 
 
-      var monsterPosX = 0;
-      var monsterPosY = 0;
-      var monsterSpeed = 5;
-
       var inputStates = {};
+      // var timeSinceLastInput = 0;
 
       var grid = [];
       gridSize = 4;
@@ -55,6 +52,9 @@ window.onload = function init() {
       }
 
       function getRandomPosition(availabeSquares){
+        if (!availabeSquares.length){
+          return 0;
+        }
         let code = availabeSquares[Math.floor(Math.random()*availabeSquares.length)];
         square = code.split(" ");
         var x = square[0];
@@ -64,6 +64,9 @@ window.onload = function init() {
 
       function createBlock(grid){
         let pos = getRandomPosition(getAvailableSquares(grid, gridSize));
+        if (pos === 0){
+          return 0;
+        }
         grid[pos[0]][pos[1]] = 2;
       }
 
@@ -258,23 +261,99 @@ window.onload = function init() {
             break;
 
         }
-        console.log(grid);
+      }
+
+      function combine(grid, gridSize, direction){
+
+        switch (direction){
+
+          case "left":
+            for (let x=0;x<gridSize;x++){
+              for (let y=1;y<gridSize;y++){
+                if (grid[x][y] == grid[x][y-1]){
+                  grid[x][y-1] *= 2;
+                  grid[x][y] = 0;
+                }
+              }
+            }
+            break;
+
+          case "up":
+            for (let x=1;x<gridSize;x++){
+              for (let y=0;y<gridSize;y++){
+                if (grid[x][y] == grid[x-1][y]){
+                  grid[x-1][y] *= 2;
+                  grid[x][y] = 0;
+                }
+              }
+            }
+            break;
+
+          case "right":
+            for (let x=gridSize-1;x>=0;x--){
+              for (let y=gridSize-2;y>=0;y--){
+                if (grid[x][y] == grid[x][y+1]){
+                  grid[x][y+1] *= 2;
+                  grid[x][y] = 0;
+                }
+              }
+            }
+            break;
+
+          case "down":
+            for (let x=gridSize-2;x>=0;x--){
+              for (let y=gridSize-1;y>=0;y--){
+                if (grid[x][y] == grid[x+1][y]){
+                  grid[x+1][y] *= 2;
+                  grid[x][y] = 0;
+                }
+              }
+            }
+            break;
+
+        }
 
       }
 
-      function checkInputs(grid, gridSize){
-        if (inputStates.left) {
-            move(grid, gridSize, 'left');   
-        }
-        if (inputStates.up) {
-          move(grid, gridSize, 'up');  
-        }
-        if (inputStates.right) {
-          move(grid, gridSize, 'right');
-        }
-        if (inputStates.down) {
-          move(grid, gridSize, 'down');
-        }
+      function checkInputs(grid, gridSize, newTime){
+        // if (newTime - timeSinceLastInput < 250){
+        //   inputStates.left = false;
+        //   inputStates.up = false;
+        //   inputStates.right = false;
+        //   inputStates.down = false;
+        // }
+        // else{
+        //   timeSinceLastInput = newTime;
+        // }
+
+          if (inputStates.left) {
+              move(grid, gridSize, 'left');
+              combine(grid, gridSize, 'left');
+              move(grid, gridSize, 'left');
+              createBlock(grid);
+              inputStates.left = false;
+              }
+          if (inputStates.up) {
+                move(grid, gridSize, 'up');
+                combine(grid, gridSize, 'up');  
+                move(grid, gridSize, 'up');
+                createBlock(grid);
+                inputStates.up = false;
+              }
+          if (inputStates.right) {
+                move(grid, gridSize, 'right');
+                combine(grid, gridSize, 'right');
+                move(grid, gridSize, 'right');
+                createBlock(grid);
+                inputStates.right = false;
+              }
+          if (inputStates.down) {
+                move(grid, gridSize, 'down');
+                combine(grid, gridSize, 'down');
+                move(grid, gridSize, 'down');
+                createBlock(grid);
+                inputStates.down = false;
+              }
       }  
     
       var mainLoop = function(time){
@@ -283,7 +362,7 @@ window.onload = function init() {
           measureFPS(time);
 
           // check inputStates
-          checkInputs(grid, gridSize);
+          checkInputs(grid, gridSize, time);
         
           // Clear the grid
           clearGrid(gridSize);
@@ -305,13 +384,16 @@ window.onload = function init() {
     
           // often useful
           w = canvas.width; 
-          h = canvas.height;  
+          h = canvas.height;
+
+          let inputRepeat = false;
     
           // important, we will draw with this object
           ctx = canvas.getContext('2d');
 
         // Add the listener to the main, window object, and update the states
         window.addEventListener('keydown', function(event){
+
             if (event.keyCode === 37) {
             inputStates.left = true;
             } else if (event.keyCode === 38) {
@@ -322,7 +404,12 @@ window.onload = function init() {
             inputStates.down = true;
             } else if (event.keyCode === 32) {
             inputStates.space = true;
+            } else {
+              return 0;
             }
+
+            window.onkeydown = null;
+
         }, false);
         // If the key is released, change the states object
         window.addEventListener('keyup', function(event){
@@ -337,6 +424,27 @@ window.onload = function init() {
             } else if (event.keyCode === 32) {
             inputStates.space = false;
             }
+
+            window.addEventListener('keydown', function(event){
+
+              if (event.keyCode === 37) {
+              inputStates.left = true;
+              } else if (event.keyCode === 38) {
+              inputStates.up = true;
+              } else if (event.keyCode === 39) {
+              inputStates.right = true;
+              } else if (event.keyCode === 40) {
+              inputStates.down = true;
+              } else if (event.keyCode === 32) {
+              inputStates.space = true;
+              } else {
+                return 0;
+              }
+  
+              window.onkeydown = null;
+  
+          }, false);
+
         }, false);
     
   
