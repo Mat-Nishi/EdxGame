@@ -20,7 +20,8 @@ window.onload = function init() {
       // var timeSinceLastInput = 0;
 
       var grid = [];
-      gridSize = 4;
+      var gridSize = 10;
+      var goal = 2048;
 
       function drawGrid(){
         size = w/gridSize;
@@ -354,7 +355,62 @@ window.onload = function init() {
                 createBlock(grid);
                 inputStates.down = false;
               }
-      }  
+      }
+
+      function checkPossibleMoves(grid, gridSize){
+        for (let x=0;x<gridSize;x++){
+          for (let y=0;y<gridSize;y++){
+
+            if (grid[x][y] == 0){
+              return true;
+            }
+            // above
+            if(x>0){
+              if (grid[x][y] == grid[x-1][y]){
+                return true;
+            }}
+            // below
+            if(x<gridSize-1){
+              if (grid[x][y] == grid[x+1][y]){
+                return true;
+            }}
+            // left
+            if(y>0){
+              if (grid[x][y] == grid[x][y-1]){
+                return true;
+            }}
+            // right
+            if(x<gridSize-1){
+              if (grid[x][y] == grid[x][y+1]){
+                return true;
+            }}
+
+          }
+        }
+        return false;
+      }
+
+      function checkGameOver(grid, gridSize, goal){
+        for (let x = 0; x < gridSize; x++) {
+          for (let y = 0; y < gridSize; y++) {
+            if (grid[x][y] >= goal){
+              ctx.save();
+              ctx.fillStyle = ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
+              ctx.fillRect(0,0,w,h);
+              ctx.restore();
+              return 1;
+            }
+          }
+        }
+
+        if (!checkPossibleMoves(grid, gridSize)){
+          ctx.save();
+          ctx.fillStyle = ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+          ctx.fillRect(0,0,w,h);
+          ctx.restore();
+          return 0;
+        }
+      }
     
       var mainLoop = function(time){
 
@@ -369,6 +425,9 @@ window.onload = function init() {
 
           // Draw values
           drawGridValues(grid, gridSize);  
+
+          // Check for game over
+          checkGameOver(grid, gridSize, goal);
         
           // call the animation loop every 1/60th of second
           requestAnimationFrame(mainLoop);
@@ -386,7 +445,7 @@ window.onload = function init() {
           w = canvas.width; 
           h = canvas.height;
 
-          let inputRepeat = false;
+          
     
           // important, we will draw with this object
           ctx = canvas.getContext('2d');
@@ -404,9 +463,7 @@ window.onload = function init() {
             inputStates.down = true;
             } else if (event.keyCode === 32) {
             inputStates.space = true;
-            } else {
-              return 0;
-            }
+            } 
 
             window.onkeydown = null;
 
