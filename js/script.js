@@ -20,7 +20,8 @@ window.onload = function init() {
       // var timeSinceLastInput = 0;
 
       var grid = [];
-      var gridSize = 10;
+      var blocks =[];
+      var gridSize = 4;
       var goal = 2048;
 
       function drawGrid(){
@@ -63,12 +64,39 @@ window.onload = function init() {
         return [x,y];
       }
 
-      function createBlock(grid){
+      class Block{
+        constructor(x,y, value){
+          this.x = x;
+          this.y = y;
+          this.value = value;
+        }
+      }
+
+      function createBlock(grid, blocks){
         let pos = getRandomPosition(getAvailableSquares(grid, gridSize));
         if (pos === 0){
           return 0;
         }
-        grid[pos[0]][pos[1]] = 2;
+
+        let valueList = [];
+          for (let i=0;i<100; i++) {
+            if (i<75){
+              valueList.push(2);
+            }
+            else if (i<93){
+              valueList.push(4);
+            }
+            else if (i<98){
+              valueList.push(8);
+            }
+            else{
+              valueList.push(16);
+            }
+          }
+        let value = valueList[Math.floor(Math.random()*valueList.length)]
+
+        grid[pos[0]][pos[1]] = value;
+        blocks.push(new Block(pos[0], pos[1], value));
       }
 
       function startGrid(grid, gridSize){
@@ -81,7 +109,7 @@ window.onload = function init() {
             grid.push(line);
         }
         for (let i = 0; i < 2; i++) {
-            createBlock(grid);
+            createBlock(grid, blocks);
             }
         }        
 
@@ -172,6 +200,10 @@ window.onload = function init() {
     
         // restore the context
         ctx.restore(); 
+      }
+
+      function animateMove(grid, gridSize){
+
       }
 
       function move(grid, gridSize, direction){
@@ -331,28 +363,28 @@ window.onload = function init() {
               move(grid, gridSize, 'left');
               combine(grid, gridSize, 'left');
               move(grid, gridSize, 'left');
-              createBlock(grid);
+              createBlock(grid,blocks);
               inputStates.left = false;
               }
           if (inputStates.up) {
                 move(grid, gridSize, 'up');
                 combine(grid, gridSize, 'up');  
                 move(grid, gridSize, 'up');
-                createBlock(grid);
+                createBlock(grid,blocks);
                 inputStates.up = false;
               }
           if (inputStates.right) {
                 move(grid, gridSize, 'right');
                 combine(grid, gridSize, 'right');
                 move(grid, gridSize, 'right');
-                createBlock(grid);
+                createBlock(grid,blocks);
                 inputStates.right = false;
               }
           if (inputStates.down) {
                 move(grid, gridSize, 'down');
                 combine(grid, gridSize, 'down');
                 move(grid, gridSize, 'down');
-                createBlock(grid);
+                createBlock(grid,blocks);
                 inputStates.down = false;
               }
       }
@@ -415,7 +447,7 @@ window.onload = function init() {
       var mainLoop = function(time){
 
           //main function, called each frame 
-          measureFPS(time);
+          // measureFPS(time);
 
           // check inputStates
           checkInputs(grid, gridSize, time);
