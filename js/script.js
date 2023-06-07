@@ -25,6 +25,8 @@ window.onload = function init() {
       var goal = 2048;
 
       function drawGrid(){
+        ctx.save();
+        ctx.strokeStyle = "rgb(108, 40, 141)";
         size = w/gridSize;
         for (let i = 1; i < gridSize; i++) {
             ctx.beginPath();
@@ -38,6 +40,7 @@ window.onload = function init() {
             ctx.lineTo(w, size*i);
             ctx.stroke();
         }
+        ctx.restore();
       }
 
       function getAvailableSquares(grid, gridSize){
@@ -114,19 +117,73 @@ window.onload = function init() {
         }        
 
       function drawSquare(x,y){
+
+        let colors = ["D38FAB", "BF81A9", "AC72A6", "9864A4", "8556A1", "71489F", "5D399C", "4A2B9A", "361D97", "230E95", "0F0092"];
+        let color;
+        switch(grid[x][y]){
+          case 2:
+            color = colors[0];
+            break;
+          
+          case 4:
+            color = colors[1];
+            break;
+            
+          case 8:
+            color = colors[2];
+            break;
+              
+          case 16:
+            color = colors[3];
+            break;
+                
+          case 32:
+            color = colors[4];
+            break;
+                  
+          case 64:
+            color = colors[5];
+            break;
+                    
+          case 128:
+            color = colors[6];
+            break;
+                      
+          case 256:
+            color = colors[7];
+            break;
+                        
+          case 512:
+            color = colors[8];
+            break;
+                          
+          case 1024:
+            color = colors[9];
+            break;
+                            
+          case 2048:
+            color = colors[10];
+            break;
+                              
+                                                                                                                        
+        }
+
         let gridX = (w/gridSize)*y;
         let gridY = (h/gridSize)*x;
         let sqHeight = h/gridSize;
 
         ctx.save();
         ctx.translate(gridX,gridY);
-        // ctx.fillstyle = "#505050"
-        // ctx.fillRect(0,0,sqHeight,sqHeight);
+        ctx.fillStyle = '#'+color;
+        ctx.fillRect(0,0,sqHeight,sqHeight);
+        ctx.restore();
 
+        ctx.save();
         ctx.strokeStyle = "black";
         ctx.font="60px Georgia";
         ctx.textAlign="center"; 
         ctx.textBaseline = "middle";
+        ctx.translate(gridX,gridY);
         ctx.fillText(grid[x][y], sqHeight/2,sqHeight/2);
         ctx.restore();
       }
@@ -140,6 +197,13 @@ window.onload = function init() {
             }
         }
       }
+
+      // function drawGridValues(blocks){
+      //   for (let i=0;i<blocks.lenght;i++){
+      //     let block = blocks[i];
+      //     drawSquare(block.x,block.y);
+      //   }
+      // }
     
       var measureFPS = function(newTime){
         
@@ -167,7 +231,7 @@ window.onload = function init() {
        // clears the canvas content
        function clearGrid(gridSize) {
          ctx.clearRect(0, 0, w, h);
-         drawGrid();
+        //  drawGrid();
        }
     
        // Functions for drawing the monster and maybe other objects
@@ -456,7 +520,10 @@ window.onload = function init() {
           clearGrid(gridSize);
 
           // Draw values
-          drawGridValues(grid, gridSize);  
+          drawGridValues(grid, gridSize);
+          // drawGridValues(blocks);
+
+          drawGrid();
 
           // Check for game over
           checkGameOver(grid, gridSize, goal);
