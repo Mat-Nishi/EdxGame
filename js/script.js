@@ -20,9 +20,12 @@ window.onload = function init() {
       // var timeSinceLastInput = 0;
 
       var grid = [];
+      var prevGrid = [];
       var blocks =[];
       var gridSize = 4;
       var goal = 2048;
+      var animateDirection = 'none';
+      var frame;
 
       function drawGrid(){
         ctx.save();
@@ -114,6 +117,9 @@ window.onload = function init() {
         for (let i = 0; i < 2; i++) {
             createBlock(grid, blocks);
             }
+
+          prevGrid = copyGrid(grid, gridSize);
+
         }        
 
       function drawSquare(x,y){
@@ -266,11 +272,122 @@ window.onload = function init() {
         ctx.restore(); 
       }
 
-      function animateMove(grid, gridSize){
+      function animateMove(grid, gridSize, direction, frame){
 
+        let colors = ["D38FAB", "BF81A9", "AC72A6", "9864A4", "8556A1", "71489F", "5D399C", "4A2B9A", "361D97", "230E95", "0F0092"];
+        let color;
+        let positions = [];
+
+        // get positions with number cells
+
+        for (let x=0;x<gridSize;x++){
+          for (let y=0;y<gridSize;y++){
+            switch (grid[x][y]){
+
+              case 0:
+                break;
+
+              case 2:
+                color = colors[0];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+              
+              case 4:
+                color = colors[1];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                
+              case 8:
+                color = colors[2];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                  
+              case 16:
+                color = colors[3];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                    
+              case 32:
+                color = colors[4];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                      
+              case 64:
+                color = colors[5];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                        
+              case 128:
+                color = colors[6];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                          
+              case 256:
+                color = colors[7];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                            
+              case 512:
+                color = colors[8];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                              
+              case 1024:
+                color = colors[9];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+                                
+              case 2048:
+                color = colors[10];
+                positions.push([((w/gridSize)*x),((h/gridSize)*y),color,grid[x][y]]);
+                break;
+            } 
+          }
+        }
+
+        // run animation
+        moveAnimation(grid,gridSize,direction,positions,frame);
+        }
+
+      function moveAnimation(grid, gridSize, direction, positions,frame){
+        // console.log(positions);
+        let sqWidth = w/gridSize;
+        let sqHeight = h/gridSize;
+        // console.log(positions)
+
+          clearGrid(gridSize);
+          // drawGridValues(grid, gridSize);
+          drawGrid();
+
+          for (let block=0;block<positions.length;block++){
+            
+            positions[block][0] += ((w-positions[block][0])/10)*frame;
+            
+            ctx.save();
+            ctx.translate(positions[block][0],positions[block][1]);
+            ctx.fillStyle = "#"+positions[block][2];
+            ctx.fillRect(0, 0, sqWidth,sqHeight);
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(positions[block][0],positions[block][1]);
+            ctx.strokeStyle = "black";
+            ctx.font="60px Georgia";
+            ctx.textAlign="center"; 
+            ctx.textBaseline = "middle";
+            ctx.fillText(positions[block][3], sqHeight/2,sqHeight/2);
+            ctx.restore();
+
+            ctx.restore();
+          }
       }
 
-      function move(grid, gridSize, direction){
+      function move(grid, gridSize, direction, updateGrid){
+
+        if (updateGrid){
+          prevGrid = copyGrid(grid,gridSize);
+        }
+
         switch (direction){
 
           case "left":
@@ -424,30 +541,34 @@ window.onload = function init() {
         // }
 
           if (inputStates.left) {
-              move(grid, gridSize, 'left');
+              move(grid, gridSize, 'left', true);
               combine(grid, gridSize, 'left');
-              move(grid, gridSize, 'left');
+              move(grid, gridSize, 'left',false);
+              animateDirection = 'left';
               createBlock(grid,blocks);
               inputStates.left = false;
               }
           if (inputStates.up) {
-                move(grid, gridSize, 'up');
+                move(grid, gridSize, 'up',true);
                 combine(grid, gridSize, 'up');  
-                move(grid, gridSize, 'up');
+                move(grid, gridSize, 'up',false);
+                animateDirection = 'up';
                 createBlock(grid,blocks);
                 inputStates.up = false;
               }
           if (inputStates.right) {
-                move(grid, gridSize, 'right');
+                move(grid, gridSize, 'right',true);
                 combine(grid, gridSize, 'right');
-                move(grid, gridSize, 'right');
+                move(grid, gridSize, 'right',false);
+                animateDirection = 'right';
                 createBlock(grid,blocks);
                 inputStates.right = false;
               }
           if (inputStates.down) {
-                move(grid, gridSize, 'down');
+                move(grid, gridSize, 'down',true);
                 combine(grid, gridSize, 'down');
-                move(grid, gridSize, 'down');
+                move(grid, gridSize, 'down',false);
+                animateDirection = 'down';
                 createBlock(grid,blocks);
                 inputStates.down = false;
               }
@@ -507,27 +628,57 @@ window.onload = function init() {
           return 0;
         }
       }
+
+      function copyGrid(grid,gridSize){
+        var copy = []
+
+        for (let x = 0; x < gridSize; x++) {
+          copy.push([]);
+          for (let y = 0; y < gridSize; y++) {
+            copy[x].push(grid[x][y]);
+            
+          } 
+        }
+        return copy;
+      }
     
       var mainLoop = function(time){
+
+        if (frame >= 10){
+          animateDirection = 'none';
+        }
 
           //main function, called each frame 
           // measureFPS(time);
 
           // check inputStates
           checkInputs(grid, gridSize, time);
-        
-          // Clear the grid
-          clearGrid(gridSize);
 
-          // Draw values
-          drawGridValues(grid, gridSize);
-          // drawGridValues(blocks);
+          if (animateDirection == 'none'){
+            
+            frame = 1;
+            // Clear the grid
+            clearGrid(gridSize);
+            
+            // Draw values
+            drawGridValues(grid, gridSize);
+            // drawGridValues(blocks);
+            
+            drawGrid();
+            
+            // Check for game over
+            checkGameOver(grid, gridSize, goal);
+          }
 
-          drawGrid();
+            else{
 
-          // Check for game over
-          checkGameOver(grid, gridSize, goal);
-        
+              console.log(grid);
+              console.log(prevGrid);
+              animateMove(grid,gridSize,animateDirection,frame);
+              frame++;
+          }
+
+            
           // call the animation loop every 1/60th of second
           requestAnimationFrame(mainLoop);
       };
@@ -604,8 +755,9 @@ window.onload = function init() {
         }, false);
     
   
-          startGrid(grid,gridSize);
+          startGrid(grid,gridSize, prevGrid);
           console.log(grid);
+          console.log(prevGrid);
 
           // start the animation
           requestAnimationFrame(mainLoop);
