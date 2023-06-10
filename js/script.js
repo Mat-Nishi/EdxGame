@@ -18,6 +18,7 @@ window.onload = function init() {
 
       var inputStates = {};
       // var timeSinceLastInput = 0;
+      var gameState = 'menu';
 
       var grid = [];
       var prevGrid = [];
@@ -351,7 +352,7 @@ window.onload = function init() {
 
             if (draw){
 
-              increment = ((animationGrid[x][y]*sqWidth)/15)*frame;
+              increment = ((animationGrid[x][y]*sqWidth)/7)*frame;
 
               switch (direction){
 
@@ -728,6 +729,40 @@ window.onload = function init() {
         return false;
       }
 
+      function getGridSize(e){
+        let rect = e.target.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        console.log(x,' ',y); 
+      }
+
+      function drawMenu(){
+
+        let offSet = 20;
+
+        ctx.save()
+        ctx.clearRect(0, 0, w, h);
+        ctx.translate((w/4)-offSet, h/3);
+        ctx.strokeRect(0, 0, w/6, h/6);
+        ctx.strokeRect(0, h/3 + 2*offSet, w/6, h/6);
+        ctx.strokeRect(0, h/6 + offSet, w/6,h/6);
+        ctx.strokeRect(w/6 + offSet, 0, w/6,h/6);
+        ctx.strokeRect(w/6 + offSet, h/3 + 2*offSet, w/6, h/6);
+        ctx.strokeRect(w/6 + offSet, h/6 + offSet, w/6, h/6);
+        ctx.strokeRect(w/3 + 2*offSet, 0, w/6, h/6);
+        ctx.strokeRect(w/3 + 2*offSet, h/3 + 2*offSet, w/6, h/6);
+        ctx.strokeRect(w/3 + 2*offSet, h/6 + offSet, w/6, h/6);
+        ctx.restore();
+      }
+
+      function menuScreen(){
+
+        canvas = document.querySelector("#myCanvas");
+        canvas.addEventListener('click', getGridSize);
+        drawMenu();
+
+      }
+
       function checkGameOver(grid, gridSize, goal){
         for (let x = 0; x < gridSize; x++) {
           for (let y = 0; y < gridSize; y++) {
@@ -765,42 +800,60 @@ window.onload = function init() {
     
       var mainLoop = function(time){
 
-        if (frame >= 15){
-          animateDirection = 'none';
-          createBlock(grid,blocks);
-          // Clear the grid
-          clearGrid(gridSize);
-            
-          // Draw values
-          drawGridValues(grid, gridSize);
-          // drawGridValues(blocks);
-          
-          drawGrid();
+        switch (gameState){
+
+          case 'menu':
+            menuScreen();
+            break;
+
+
+          case 'game':
+
+            if (frame >= 7){
+              animateDirection = 'none';
+              createBlock(grid,blocks);
+              // Clear the grid
+              clearGrid(gridSize);
+                
+              // Draw values
+              drawGridValues(grid, gridSize);
+              // drawGridValues(blocks);
+              
+              drawGrid();
+            }
+    
+              //main function, called each frame 
+              // measureFPS(time);
+    
+              if (animateDirection == 'none'){
+                
+                frame = 1;
+    
+                // check inputStates
+                checkInputs(grid, gridSize, time);
+                
+                // Check for game over
+                checkGameOver(grid, gridSize, goal);
+              }
+    
+                else{
+                  if (frame == 1){
+                    animateMove(grid,gridSize,animateDirection,frame,true);
+                  }
+                  else{
+                    animateMove(grid,gridSize,animateDirection,frame,false);
+                  }
+                  frame++;
+              }   
+              break;
+
+
+              case 'gameOver':
+                break;
+
         }
 
-          //main function, called each frame 
-          // measureFPS(time);
-
-          if (animateDirection == 'none'){
-            
-            frame = 1;
-
-            // check inputStates
-            checkInputs(grid, gridSize, time);
-            
-            // Check for game over
-            checkGameOver(grid, gridSize, goal);
-          }
-
-            else{
-              if (frame == 1){
-                animateMove(grid,gridSize,animateDirection,frame,true);
-              }
-              else{
-                animateMove(grid,gridSize,animateDirection,frame,false);
-              }
-              frame++;
-          }            
+                 
           // call the animation loop every 1/60th of second
           requestAnimationFrame(mainLoop);
       };
