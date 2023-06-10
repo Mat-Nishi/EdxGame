@@ -15,6 +15,8 @@ window.onload = function init() {
       var lastTime;
       var fpsContainer;
       var fps; 
+      var setUp = true;
+      var drawEnd = true;
 
       var inputStates = {};
       // var timeSinceLastInput = 0;
@@ -191,7 +193,10 @@ window.onload = function init() {
 
         ctx.save();
         ctx.strokeStyle = "black";
-        ctx.font="60px Georgia";
+        ctx.font="55px Georgia";
+        if (gridSize > 5){
+          ctx.font="35px Georgia";
+        }
         ctx.textAlign="center"; 
         ctx.textBaseline = "middle";
         ctx.translate(gridX,gridY);
@@ -367,7 +372,10 @@ window.onload = function init() {
                   ctx.save();
                   ctx.translate(y*sqWidth, (x*sqWidth)-increment);
                   ctx.strokeStyle = "black";
-                  ctx.font="60px Georgia";
+                  ctx.font="55px Georgia";
+                  if (gridSize > 5){
+                    ctx.font="30px Georgia";
+                  }
                   ctx.textAlign="center"; 
                   ctx.textBaseline = "middle";
                   ctx.fillText(prevGrid[x][y], sqHeight/2,sqHeight/2);
@@ -385,7 +393,10 @@ window.onload = function init() {
                   ctx.save();
                   ctx.translate((y*sqWidth)+increment, x*sqWidth);
                   ctx.strokeStyle = "black";
-                  ctx.font="60px Georgia";
+                  ctx.font="55px Georgia";
+                  if (gridSize > 5){
+                    ctx.font="30px Georgia";
+                  }
                   ctx.textAlign="center"; 
                   ctx.textBaseline = "middle";
                   ctx.fillText(prevGrid[x][y], sqHeight/2,sqHeight/2);
@@ -403,7 +414,10 @@ window.onload = function init() {
                     ctx.save();
                     ctx.translate((y*sqWidth)-increment, x*sqWidth);
                     ctx.strokeStyle = "black";
-                    ctx.font="60px Georgia";
+                    ctx.font="55px Georgia";
+                    if (gridSize > 5){
+                      ctx.font="30px Georgia";
+                    }
                     ctx.textAlign="center"; 
                     ctx.textBaseline = "middle";
                     ctx.fillText(prevGrid[x][y], sqHeight/2,sqHeight/2);
@@ -421,7 +435,10 @@ window.onload = function init() {
                       ctx.save();
                       ctx.translate(y*sqWidth, (x*sqWidth)+increment);
                       ctx.strokeStyle = "black";
-                      ctx.font="60px Georgia";
+                      ctx.font="55px Georgia";
+                      if (gridSize > 5){
+                        ctx.font="30px Georgia";
+                      }
                       ctx.textAlign="center"; 
                       ctx.textBaseline = "middle";
                       ctx.fillText(prevGrid[x][y], sqHeight/2,sqHeight/2);
@@ -733,25 +750,52 @@ window.onload = function init() {
         let rect = e.target.getBoundingClientRect();
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
-        console.log(x,' ',y); 
+        let offSet = 40;
+        let originX = (w/4)-offSet/2;
+        let originY = h/3;
+        let sqSize = w/4;
+
+        console.log(x,' ',y);
+
+        //top left
+        if ( x>=originX && x <= originX+sqSize && y >= originY && y <= originY+sqSize){
+            gridSize = 4;
+            gameState = 'game';
+        }
+
+        //top right
+        if ( x>=originX + sqSize + offSet && x <= originX + 2*sqSize + offSet && y >= originY && y <= originY+sqSize){
+            gridSize = 5;
+            gameState = 'game';
+        }
+
+        //bot right
+        if ( x>=originX && x <= originX+sqSize && y>=originY + sqSize + offSet && y <= originY + 2*sqSize + offSet ){
+          //  console.log('mid left');
+          gridSize = 6;
+          gameState = 'game';
+        }
+
+        //bot right
+        if ( x>=originX + sqSize + offSet && x <= originX + 2*sqSize + offSet  && y>=originY + sqSize + offSet && y <= originY + 2*sqSize + offSet ){
+          gridSize = 7;
+          gameState = 'game';
+      }
+
       }
 
       function drawMenu(){
 
-        let offSet = 20;
+        let offSet = 40;
+        let sqSize = w/4;
 
         ctx.save()
         ctx.clearRect(0, 0, w, h);
-        ctx.translate((w/4)-offSet, h/3);
-        ctx.strokeRect(0, 0, w/6, h/6);
-        ctx.strokeRect(0, h/3 + 2*offSet, w/6, h/6);
-        ctx.strokeRect(0, h/6 + offSet, w/6,h/6);
-        ctx.strokeRect(w/6 + offSet, 0, w/6,h/6);
-        ctx.strokeRect(w/6 + offSet, h/3 + 2*offSet, w/6, h/6);
-        ctx.strokeRect(w/6 + offSet, h/6 + offSet, w/6, h/6);
-        ctx.strokeRect(w/3 + 2*offSet, 0, w/6, h/6);
-        ctx.strokeRect(w/3 + 2*offSet, h/3 + 2*offSet, w/6, h/6);
-        ctx.strokeRect(w/3 + 2*offSet, h/6 + offSet, w/6, h/6);
+        ctx.translate((w/4)-offSet/2, h/3);
+        ctx.strokeRect(0, 0, sqSize,sqSize);
+        ctx.strokeRect(0, sqSize + offSet, sqSize,sqSize);
+        ctx.strokeRect(sqSize + offSet, 0, sqSize,sqSize);
+        ctx.strokeRect(sqSize + offSet, sqSize + offSet, sqSize,sqSize);
         ctx.restore();
       }
 
@@ -760,27 +804,39 @@ window.onload = function init() {
         canvas = document.querySelector("#myCanvas");
         canvas.addEventListener('click', getGridSize);
         drawMenu();
+        setUp = true;
 
+      }
+
+      function drawGameOver(){
+        ctx.save();
+        ctx.fillStyle = ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0,0,w,h);
+        ctx.restore();
+        drawEnd = false;
+      }
+
+      function drawWinScreen(){
+        ctx.save();
+        ctx.fillStyle = ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
+        ctx.fillRect(0,0,w,h);
+        ctx.restore();
+        drawEnd = false;
       }
 
       function checkGameOver(grid, gridSize, goal){
         for (let x = 0; x < gridSize; x++) {
           for (let y = 0; y < gridSize; y++) {
             if (grid[x][y] >= goal){
-              ctx.save();
-              ctx.fillStyle = ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
-              ctx.fillRect(0,0,w,h);
-              ctx.restore();
+              drawWinScreen();
+              gameState = 'gameOver';
               return 1;
             }
           }
         }
 
         if (!checkPossibleMoves(grid, gridSize)){
-          ctx.save();
-          ctx.fillStyle = ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-          ctx.fillRect(0,0,w,h);
-          ctx.restore();
+          drawGameOver();
           return 0;
         }
       }
@@ -808,6 +864,19 @@ window.onload = function init() {
 
 
           case 'game':
+
+            if (setUp){
+              startGrid(grid,gridSize, prevGrid);
+              clearGrid(gridSize);
+                
+              // Draw values
+              drawGridValues(grid, gridSize);
+              // drawGridValues(blocks);
+              
+              drawGrid();
+              setUp = false;
+              drawEnd = true;
+            }
 
             if (frame >= 7){
               animateDirection = 'none';
@@ -929,15 +998,6 @@ window.onload = function init() {
 
         }, false);
     
-  
-          startGrid(grid,gridSize, prevGrid);
-          clearGrid(gridSize);
-            
-          // Draw values
-          drawGridValues(grid, gridSize);
-          // drawGridValues(blocks);
-          
-          drawGrid();
 
           // start the animation
           requestAnimationFrame(mainLoop);
