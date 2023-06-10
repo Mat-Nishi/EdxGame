@@ -63,7 +63,7 @@ body {
 
 }
 
-/* .pattern:before {
+.pattern:before {
     content: '';
     position: absolute;
     top: 0;
@@ -71,5 +71,5 @@ body {
     right: 0;
     bottom: 0;
     background: repeating-linear-gradient(45deg, #ff006e, #ff006e 20px, transparent 20px, transparent 40px);
-    opacity: 0.3;
-} */
+    opacity: 0.05;
+}
