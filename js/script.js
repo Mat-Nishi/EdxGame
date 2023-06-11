@@ -109,7 +109,8 @@ window.onload = function init() {
         blocks.push(new Block(pos[0], pos[1], value));
       }
 
-      function startGrid(grid, gridSize){
+      function startGrid(gridSize){
+        grid = [];
 
         for (let i = 0; i < gridSize; i++){
             line = [];
@@ -129,7 +130,7 @@ window.onload = function init() {
 
         }        
 
-      function drawSquare(x,y){
+      function drawSquare(x,y, drawNumbers){
 
         let colors = ["D38FAB", "BF81A9", "AC72A6", "9864A4", "8556A1", "71489F", "5D399C", "4A2B9A", "361D97", "230E95", "0F0092"];
         let color;
@@ -191,24 +192,26 @@ window.onload = function init() {
         ctx.fillRect(0,0,sqHeight,sqHeight);
         ctx.restore();
 
-        ctx.save();
-        ctx.strokeStyle = "black";
-        ctx.font="55px Georgia";
-        if (gridSize > 5){
-          ctx.font="35px Georgia";
+        if (drawNumbers){
+          ctx.save();
+          ctx.strokeStyle = "black";
+          ctx.font="55px Monospace";
+          if (gridSize > 5){
+            ctx.font="35px Monospace";
+          }
+          ctx.textAlign="center"; 
+          ctx.textBaseline = "middle";
+          ctx.translate(gridX,gridY);
+          ctx.fillText(grid[x][y], sqHeight/2,sqHeight/2);
+          ctx.restore();
         }
-        ctx.textAlign="center"; 
-        ctx.textBaseline = "middle";
-        ctx.translate(gridX,gridY);
-        ctx.fillText(grid[x][y], sqHeight/2,sqHeight/2);
-        ctx.restore();
       }
 
-      function drawGridValues(grid, gridSize){
+      function drawGridValues(grid, gridSize, drawNumbers){
         for (let x=0;x<gridSize;x++){
             for (let y=0;y<gridSize;y++){
                 if (grid[x][y] != 0) {
-                    drawSquare(x,y);
+                    drawSquare(x,y,drawNumbers);
                 }
             }
         }
@@ -372,9 +375,9 @@ window.onload = function init() {
                   ctx.save();
                   ctx.translate(y*sqWidth, (x*sqWidth)-increment);
                   ctx.strokeStyle = "black";
-                  ctx.font="55px Georgia";
+                  ctx.font="55px Monospace";
                   if (gridSize > 5){
-                    ctx.font="30px Georgia";
+                    ctx.font="35px Monospace";
                   }
                   ctx.textAlign="center"; 
                   ctx.textBaseline = "middle";
@@ -393,9 +396,9 @@ window.onload = function init() {
                   ctx.save();
                   ctx.translate((y*sqWidth)+increment, x*sqWidth);
                   ctx.strokeStyle = "black";
-                  ctx.font="55px Georgia";
+                  ctx.font="55px Monospace";
                   if (gridSize > 5){
-                    ctx.font="30px Georgia";
+                    ctx.font="35px Monospace";
                   }
                   ctx.textAlign="center"; 
                   ctx.textBaseline = "middle";
@@ -414,9 +417,9 @@ window.onload = function init() {
                     ctx.save();
                     ctx.translate((y*sqWidth)-increment, x*sqWidth);
                     ctx.strokeStyle = "black";
-                    ctx.font="55px Georgia";
+                    ctx.font="55px Monospace";
                     if (gridSize > 5){
-                      ctx.font="30px Georgia";
+                      ctx.font="35px Monospace";
                     }
                     ctx.textAlign="center"; 
                     ctx.textBaseline = "middle";
@@ -435,9 +438,9 @@ window.onload = function init() {
                       ctx.save();
                       ctx.translate(y*sqWidth, (x*sqWidth)+increment);
                       ctx.strokeStyle = "black";
-                      ctx.font="55px Georgia";
+                      ctx.font="55px Monospace";
                       if (gridSize > 5){
-                        ctx.font="30px Georgia";
+                        ctx.font="35px Monospace";
                       }
                       ctx.textAlign="center"; 
                       ctx.textBaseline = "middle";
@@ -755,8 +758,6 @@ window.onload = function init() {
         let originY = h/3;
         let sqSize = w/4;
 
-        console.log(x,' ',y);
-
         //top left
         if ( x>=originX && x <= originX+sqSize && y >= originY && y <= originY+sqSize){
             gridSize = 4;
@@ -788,59 +789,193 @@ window.onload = function init() {
 
         let offSet = 40;
         let sqSize = w/4;
+        let originX = (w/4)-offSet/2;
+        let originY = h/3;
 
-        ctx.save()
         ctx.clearRect(0, 0, w, h);
-        ctx.translate((w/4)-offSet/2, h/3);
+
+        ctx.save();
+        ctx.fillStyle = "rgb(108, 40, 141)";
+        ctx.font="55px Monospace";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText("2048",w/2,h/6);
+        ctx.restore();
+        
+        ctx.save();
+        ctx.translate(originX, originY);
+        ctx.strokeStyle = "rgb(108, 40, 141)";
+        ctx.lineWidth = 2;
         ctx.strokeRect(0, 0, sqSize,sqSize);
-        ctx.strokeRect(0, sqSize + offSet, sqSize,sqSize);
-        ctx.strokeRect(sqSize + offSet, 0, sqSize,sqSize);
-        ctx.strokeRect(sqSize + offSet, sqSize + offSet, sqSize,sqSize);
+        ctx.fillStyle = "rgb(108, 40, 141)";
+        ctx.font="55px Monospace";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText("4x4",sqSize/2,sqSize/2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(originX, originY + sqSize + offSet);
+        ctx.strokeStyle = "rgb(108, 40, 141)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, sqSize,sqSize);
+        ctx.fillStyle = "rgb(108, 40, 141)";
+        ctx.font="55px Monospace";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText("6x6",sqSize/2,sqSize/2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(originX + sqSize + offSet, originY);
+        ctx.strokeStyle = "rgb(108, 40, 141)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, sqSize,sqSize);
+        ctx.fillStyle = "rgb(108, 40, 141)";
+        ctx.font="55px Monospace";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText("5x5",sqSize/2,sqSize/2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(originX + sqSize + offSet, originY + sqSize + offSet);
+        ctx.strokeStyle = "rgb(108, 40, 141)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, sqSize,sqSize);
+        ctx.fillStyle = "rgb(108, 40, 141)";
+        ctx.font="55px Monospace";
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.fillText("7x7",sqSize/2,sqSize/2);
         ctx.restore();
       }
 
       function menuScreen(){
 
         canvas = document.querySelector("#myCanvas");
+        canvas.removeEventListener('click', restart);
         canvas.addEventListener('click', getGridSize);
         drawMenu();
         setUp = true;
 
+        inputStates.left = false;
+        inputStates.right = false;
+        inputStates.up = false;
+        inputStates.down = false;
+        inputStates.space = false;
+
       }
 
       function drawGameOver(){
+        let textWidth = w/2;
+        let textHeight = h/4;
+        let btnHeight = h/6;
+        let btnWidth = w/4;
+
+        clearGrid(gridSize);
+        drawGridValues(grid, gridSize, false);
+        drawGrid();
+
         ctx.save();
         ctx.fillStyle = ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(0,0,w,h);
         ctx.restore();
         drawEnd = false;
+
+        ctx.save();
+        ctx.translate(w/2 - textWidth/2, h/4);
+        ctx.textAlign="center";
+        ctx.textBaseline = "middle";
+        ctx.font="80px Monospace";
+        ctx.fillText("Game Over", textWidth/2,textHeight/2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(w/2 - btnWidth/2, h/2 + 20);
+        ctx.strokeRect(0,0,btnWidth,btnHeight);
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.font="40px Monospace";
+        ctx.fillText("Restart", btnWidth/2,btnHeight/2);
+        ctx.restore();
       }
 
       function drawWinScreen(){
+        let textWidth = w/2;
+        let textHeight = h/4;
+        let btnHeight = h/6;
+        let btnWidth = w/4;
+
+        clearGrid(gridSize);
+        drawGridValues(grid, gridSize, false);
+        drawGrid();
+
         ctx.save();
         ctx.fillStyle = ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
         ctx.fillRect(0,0,w,h);
         ctx.restore();
         drawEnd = false;
+
+        ctx.save();
+        ctx.translate(w/2 - textWidth/2, h/4);
+        ctx.textAlign="center";
+        ctx.textBaseline = "middle";
+        ctx.font="80px Monospace";
+        ctx.fillText("You Win!", textWidth/2,textHeight/2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(w/2 - btnWidth/2, h/2 + 20);
+        ctx.strokeRect(0,0,btnWidth,btnHeight);
+        ctx.textAlign="center"; 
+        ctx.textBaseline = "middle";
+        ctx.font="40px Monospace";
+        ctx.fillText("Restart", btnWidth/2,btnHeight/2);
+        ctx.restore();
+
       }
 
       function checkGameOver(grid, gridSize, goal){
         for (let x = 0; x < gridSize; x++) {
           for (let y = 0; y < gridSize; y++) {
             if (grid[x][y] >= goal){
-              drawWinScreen();
+              canvas = document.querySelector("#myCanvas");
+              canvas.addEventListener('click', restart);
               gameState = 'gameOver';
-              return 1;
+              if (drawEnd){
+                drawWinScreen();
+              }
             }
           }
         }
 
+        
         if (!checkPossibleMoves(grid, gridSize)){
-          drawGameOver();
-          return 0;
+          canvas = document.querySelector("#myCanvas");
+          canvas.addEventListener('click', restart);
+          gameState = 'gameOver';
+          if (drawEnd){
+            drawGameOver();
+          }
         }
       }
 
+      function restart(e){
+        let rect = e.target.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        
+        let btnWidth = w/4;
+        let btnHeight = h/6;
+        let originX = w/2 - btnWidth/2;
+        let originY = h/2 + 20;
+
+        if ( x>=originX && x <= originX+btnWidth && y >= originY && y <= originY+btnHeight){
+          gameState = 'menu';
+        }
+      }
+      
       function copyGrid(grid,gridSize){
         var copy = []
 
@@ -866,16 +1001,20 @@ window.onload = function init() {
           case 'game':
 
             if (setUp){
-              startGrid(grid,gridSize, prevGrid);
+              startGrid(gridSize);
               clearGrid(gridSize);
                 
               // Draw values
-              drawGridValues(grid, gridSize);
+              drawGridValues(grid, gridSize, true);
               // drawGridValues(blocks);
               
               drawGrid();
+
+              canvas.removeEventListener('click', getGridSize);
+
               setUp = false;
               drawEnd = true;
+              animateDirection = 'none';
             }
 
             if (frame >= 7){
@@ -885,7 +1024,7 @@ window.onload = function init() {
               clearGrid(gridSize);
                 
               // Draw values
-              drawGridValues(grid, gridSize);
+              drawGridValues(grid, gridSize, true);
               // drawGridValues(blocks);
               
               drawGrid();
@@ -918,6 +1057,7 @@ window.onload = function init() {
 
 
               case 'gameOver':
+
                 break;
 
         }
