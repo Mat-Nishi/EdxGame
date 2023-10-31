@@ -1084,6 +1084,23 @@ window.onload = function init() {
           // important, we will draw with this object
           ctx = canvas.getContext('2d');
 
+        // swiped-left
+          canvas.addEventListener('swiped-left', function(e) {
+            inputStates.left = true;
+        });
+        // swiped-right
+        document.addEventListener('swiped-right', function(e) {
+          inputStates.right = true;
+        });
+        // swiped-up
+        document.addEventListener('swiped-up', function(e) {
+          inputStates.up = true;
+        });
+        // swiped-down
+        document.addEventListener('swiped-down', function(e) {
+          inputStates.down = true;
+        });
+
         // Add the listener to the main, window object, and update the states
         window.addEventListener('keydown', function(event){
 
