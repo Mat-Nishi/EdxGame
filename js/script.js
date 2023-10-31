@@ -1085,7 +1085,7 @@ window.onload = function init() {
           ctx = canvas.getContext('2d');
 
         // swiped-left
-          canvas.addEventListener('swiped-left', function(e) {
+          document.addEventListener('swiped-left', function(e) {
             inputStates.left = true;
         });
         // swiped-right
